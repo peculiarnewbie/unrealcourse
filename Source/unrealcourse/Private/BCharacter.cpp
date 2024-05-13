@@ -85,6 +85,7 @@ void ABCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponen
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ABCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ABCharacter::Jump);
 }
 
 void ABCharacter:: PrimaryAttack()
