@@ -6,10 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "BMagicProjectile.generated.h"
 
-class USphereComponent;
-class UProjectileMovementComponent;
-class UParticleSystemComponent;
-
 UCLASS()
 class UNREALCOURSE_API ABMagicProjectile : public AActor
 {
@@ -21,13 +17,6 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereComp;
-
-	UPROPERTY(VisibleAnywhere)
-	UProjectileMovementComponent* MovementComp;
-
-	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* EffectComp;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
