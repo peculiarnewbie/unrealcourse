@@ -4,7 +4,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-//
+#include "BInteractionComponent.h"
+
 // Sets default values
 ABCharacter::ABCharacter()
 {
@@ -17,6 +18,8 @@ ABCharacter::ABCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	InteractionComp = CreateDefaultSubobject<UBInteractionComponent>("InteractionComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -85,18 +88,89 @@ void ABCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponen
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ABCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("SpecialAttack", IE_Pressed, this, &ABCharacter::SpecialAttack);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ABCharacter::Dash);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ABCharacter::Jump);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ABCharacter::PrimaryInteract);
 }
 
 void ABCharacter:: PrimaryAttack()
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FRotator projectileRotation = CalculateProjectileRotation(HandLocation, GetControlRotation(), 10000);
 
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	FTransform SpawnTM = FTransform(projectileRotation, HandLocation);
 	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
+	SpawnParams.Instigator = this;
 
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);;
 }
+
+void ABCharacter::SpecialAttack()
+{
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_02");
+	FRotator projectileRotation = CalculateProjectileRotation(HandLocation, GetControlRotation(), 3000);
+
+	FTransform SpawnTM = FTransform(projectileRotation, HandLocation);
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
+
+	GetWorld()->SpawnActor<AActor>(SpecialProjectileClass, SpawnTM, SpawnParams);;
+}
+
+void ABCharacter::Dash()
+{
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_02");
+	FRotator projectileRotation = CalculateProjectileRotation(HandLocation, GetControlRotation(), 3000);
+
+	FTransform SpawnTM = FTransform(projectileRotation, HandLocation);
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
+
+	GetWorld()->SpawnActor<AActor>(SpecialProjectileClass, SpawnTM, SpawnParams);;
+}
+
+FRotator ABCharacter::CalculateProjectileRotation(FVector start, FRotator rotation, float endRange)
+{
+	FRotator endRotation;
+
+	AActor* MyOwner = CameraComp->GetOwner();
+
+	FVector CameraPosition = CameraComp->GetComponentLocation();
+
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_MAX); // probably shouldn't do this 
+
+	FVector End = CameraPosition + (rotation.Vector() * endRange);
+
+	FHitResult Hit;
+	bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, CameraPosition, End, ObjectQueryParams);
+
+
+	if (bBlockingHit)
+	{
+		endRotation = ( Hit.ImpactPoint - start).Rotation();
+	}
+	else
+	{
+		endRotation = (Hit.TraceEnd - start).Rotation();
+	}
+
+//	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+//	DrawDebugLine(GetWorld(), CameraPosition, End, LineColor, false, 2.0f, 0, 2.0f);
+
+	return endRotation;
+}
+
+void ABCharacter::PrimaryInteract() 
+{
+	InteractionComp->PrimaryInteract();
+}
+

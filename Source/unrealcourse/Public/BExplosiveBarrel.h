@@ -20,16 +20,21 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	URadialForceComponent* RadialForceComp;
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
 	// Called when the game starts or when spawned
 
+	UFUNCTION()
 	void Explode();
 
-	FScriptDelegate OnHitDelegate;
+	virtual void PostInitializeComponents() override;
+
+	UFUNCTION()
+	void OnActorHit();
+
 	virtual void BeginPlay() override;
 
 public:	

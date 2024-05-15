@@ -4,14 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "BProjectileBase.h"
 #include "BMagicProjectile.generated.h"
 
-class USphereComponent;
-class UProjectileMovementComponent;
-class UParticleSystemComponent;
 
 UCLASS()
-class UNREALCOURSE_API ABMagicProjectile : public AActor
+class UNREALCOURSE_API ABMagicProjectile : public ABProjectileBase
 {
 	GENERATED_BODY()
 	
@@ -20,14 +18,6 @@ public:
 	ABMagicProjectile();
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereComp;
-
-	UPROPERTY(VisibleAnywhere)
-	UProjectileMovementComponent* MovementComp;
-
-	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* EffectComp;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

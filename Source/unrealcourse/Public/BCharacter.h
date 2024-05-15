@@ -8,6 +8,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UBInteractionComponent;
 
 UCLASS()
 class UNREALCOURSE_API ABCharacter : public ACharacter
@@ -17,6 +18,8 @@ class UNREALCOURSE_API ABCharacter : public ACharacter
 protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> SpecialProjectileClass;
 
 public:
 	// Sets default values for this character's properties
@@ -30,6 +33,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 
+	UBInteractionComponent* InteractionComp;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -37,6 +42,11 @@ protected:
 	void MoveRight(float value);
 
 	void PrimaryAttack();
+	void SpecialAttack();
+	void PrimaryInteract();
+	void Dash();
+
+	FRotator CalculateProjectileRotation(FVector start, FRotator rotation, float endRange);
 
 public:	
 	// Called every frame
@@ -44,5 +54,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 };
