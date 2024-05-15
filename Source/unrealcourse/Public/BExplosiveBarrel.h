@@ -28,12 +28,7 @@ protected:
 	// Called when the game starts or when spawned
 
 	UFUNCTION()
-	void Explode();
-
-	virtual void PostInitializeComponents() override;
-
-	UFUNCTION()
-	void OnActorHit();
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 	virtual void BeginPlay() override;
 

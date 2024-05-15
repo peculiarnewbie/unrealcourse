@@ -5,6 +5,10 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BInteractionComponent.h"
+#include "BAttributeComponent.h"
+
+
+	
 
 // Sets default values
 ABCharacter::ABCharacter()
@@ -21,9 +25,13 @@ ABCharacter::ABCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UBInteractionComponent>("InteractionComp");
 
+	AttributeComp = CreateDefaultSubobject<UBAttributeComponent>("AttributeComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
+
+	teleportTime = 0.4f;
 }
 
 // Called when the game starts or when spawned
@@ -133,7 +141,19 @@ void ABCharacter::Dash()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
 
-	GetWorld()->SpawnActor<AActor>(SpecialProjectileClass, SpawnTM, SpawnParams);;
+	DashActor = GetWorld()->SpawnActor<AActor>(DashProjectileClass, SpawnTM, SpawnParams);
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(
+		UnusedHandle, this, &ABCharacter::Teleport, teleportTime, false);
+}
+
+void ABCharacter::Teleport()
+{
+	FVector newPosition = DashActor->GetActorLocation();
+	SetActorLocation(newPosition);
+	UE_LOG(LogTemp, Log, TEXT("CMON %f, %f, %f"), newPosition.X, newPosition.Y, newPosition.Z);
+	return;
 }
 
 FRotator ABCharacter::CalculateProjectileRotation(FVector start, FRotator rotation, float endRange)

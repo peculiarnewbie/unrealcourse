@@ -14,11 +14,14 @@ ABExplosiveBarrel::ABExplosiveBarrel()
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForce");
 	RadialForceComp->SetupAttachment(StaticMeshComp);
 
+	//StaticMeshComp->OnComponentHit.AddDynamic(this, &ABExplosiveBarrel::Explode);
+
 }
 
 // Called when the game starts or when spawned
 void ABExplosiveBarrel::BeginPlay()
 {
+	StaticMeshComp->OnComponentHit.AddDynamic(this, &ABExplosiveBarrel::OnHit);
 	Super::BeginPlay();
 }
 
@@ -28,24 +31,8 @@ void ABExplosiveBarrel::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABExplosiveBarrel::Explode()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Hit!"));
-	RadialForceComp->FireImpulse();
-}
-
-void ABExplosiveBarrel::PostInitializeComponents()
-{
-	// Don't forget to call parent function
-	Super::PostInitializeComponents();
-}
-
-
-void ABExplosiveBarrel::OnActorHit()
+void ABExplosiveBarrel::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	RadialForceComp->FireImpulse();
-
-	UE_LOG(LogTemp, Log, TEXT("OnActorHit in Explosive Barrel"));
-
-
 }
+

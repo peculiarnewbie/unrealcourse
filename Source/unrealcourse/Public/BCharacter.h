@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "BAttributeComponent.h"
 #include "BCharacter.generated.h"
 
 class UCameraComponent;
@@ -20,6 +21,8 @@ protected:
 	TSubclassOf<AActor> ProjectileClass;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> SpecialProjectileClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> DashProjectileClass;
 
 public:
 	// Sets default values for this character's properties
@@ -35,6 +38,9 @@ protected:
 
 	UBInteractionComponent* InteractionComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UBAttributeComponent* AttributeComp;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -44,7 +50,10 @@ protected:
 	void PrimaryAttack();
 	void SpecialAttack();
 	void PrimaryInteract();
+	float teleportTime;
+	AActor* DashActor;
 	void Dash();
+	void Teleport();
 
 	FRotator CalculateProjectileRotation(FVector start, FRotator rotation, float endRange);
 
