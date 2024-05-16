@@ -23,6 +23,13 @@ bool UBAttributeComponent::ApplyHealthChange(float Delta)
 
 	OnHealthChanged.Broadcast(nullptr, this, HealthMax, Health, Delta);
 
+	if (Health < 0.0f) Health = 0.0f;
+	else if (Health > HealthMax) Health = HealthMax;
+
 	return true;
 }
 
+float UBAttributeComponent::GetIsHealthFull()
+{
+	return Health >= HealthMax;
+}
