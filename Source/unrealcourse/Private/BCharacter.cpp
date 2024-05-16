@@ -201,12 +201,16 @@ void ABCharacter::PrimaryInteract()
 }
 
 
-void ABCharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float NewHealth, float Delta)
+void ABCharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp,float HealthMax, float NewHealth, float Delta)
 {
 	if (NewHealth <= 0.0f)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
 
+	}
+	if (Delta < 0.0f)
+	{
+		GetComponentByClass<USkeletalMeshComponent>()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
 	}
 }

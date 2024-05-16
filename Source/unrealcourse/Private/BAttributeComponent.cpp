@@ -7,7 +7,8 @@
 UBAttributeComponent::UBAttributeComponent()
 {
 
-	Health = 100;
+	HealthMax = 100;
+	Health = HealthMax;
 
 }
 
@@ -20,7 +21,7 @@ bool UBAttributeComponent::ApplyHealthChange(float Delta)
 {
 	Health += Delta;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	OnHealthChanged.Broadcast(nullptr, this, HealthMax, Health, Delta);
 
 	return true;
 }

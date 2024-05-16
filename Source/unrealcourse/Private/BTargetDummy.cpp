@@ -17,7 +17,7 @@ ABTargetDummy::ABTargetDummy()
 
 }
 
-void ABTargetDummy::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float NewHealth, float Delta)
+void ABTargetDummy::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta)
 {
 	if (Delta < 0.0f)
 	{

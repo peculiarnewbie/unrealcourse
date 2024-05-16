@@ -59,7 +59,7 @@ protected:
 
 
 	UFUNCTION()
-	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float NewHealth, float Delta);
+	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
 
 	virtual void PostInitializeComponents();
 
