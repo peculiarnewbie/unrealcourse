@@ -57,6 +57,12 @@ protected:
 
 	FRotator CalculateProjectileRotation(FVector start, FRotator rotation, float endRange);
 
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float NewHealth, float Delta);
+
+	virtual void PostInitializeComponents();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

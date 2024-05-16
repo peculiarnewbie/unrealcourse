@@ -9,6 +9,8 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
+class UAudioComponent;
+class USoundBase;
 
 UCLASS()
 class UNREALCOURSE_API ABProjectileBase : public AActor
@@ -28,6 +30,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UAudioComponent* FlightAudio;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* ImpactSound;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

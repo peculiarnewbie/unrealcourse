@@ -34,6 +34,13 @@ ABCharacter::ABCharacter()
 	teleportTime = 0.4f;
 }
 
+void ABCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ABCharacter::OnHealthChanged);
+}
+
 // Called when the game starts or when spawned
 void ABCharacter::BeginPlay()
 {
@@ -152,7 +159,6 @@ void ABCharacter::Teleport()
 {
 	FVector newPosition = DashActor->GetActorLocation();
 	SetActorLocation(newPosition);
-	UE_LOG(LogTemp, Log, TEXT("CMON %f, %f, %f"), newPosition.X, newPosition.Y, newPosition.Z);
 	return;
 }
 
@@ -194,3 +200,13 @@ void ABCharacter::PrimaryInteract()
 	InteractionComp->PrimaryInteract();
 }
 
+
+void ABCharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	if (NewHealth <= 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+
+	}
+}

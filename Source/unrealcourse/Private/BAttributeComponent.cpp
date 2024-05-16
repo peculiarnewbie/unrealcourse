@@ -11,6 +11,11 @@ UBAttributeComponent::UBAttributeComponent()
 
 }
 
+bool UBAttributeComponent::IsAlive() const
+{
+	return Health > 0.0f;
+}
+
 bool UBAttributeComponent::ApplyHealthChange(float Delta)
 {
 	Health += Delta;
