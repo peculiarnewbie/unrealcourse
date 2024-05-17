@@ -6,24 +6,28 @@
 #include "GameFramework/Character.h"
 #include "BAICharacter.generated.h"
 
+class UPawnSensingComponent;
+
 UCLASS()
 class UNREALCOURSE_API ABAICharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ABAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnSensingComponent* PawnSensingComp;
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
+
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };

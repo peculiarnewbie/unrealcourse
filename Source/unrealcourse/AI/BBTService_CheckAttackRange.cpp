@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "BBTService_CheckAttackRange.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-#include "BBTService_CheckAttackRange.h"
 
 void UBBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
