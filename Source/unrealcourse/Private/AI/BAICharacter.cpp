@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BAICharacter.h"
+#include "AI/BAICharacter.h"
 #include "Perception/PawnSensingComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -9,6 +9,10 @@
 ABAICharacter::ABAICharacter()
 {
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	AttributeComp = CreateDefaultSubobject<UBAttributeComponent>("AttributeComp");
 }
 
 void ABAICharacter::PostInitializeComponents()
@@ -16,6 +20,8 @@ void ABAICharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &ABAICharacter::OnPawnSeen);
+
+	//AttributeComp->OnHealthChanged.AddDynamic(this, &ABCharacter::OnHealthChanged);
 }
 
 void ABAICharacter::OnPawnSeen(APawn* Pawn)

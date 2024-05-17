@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "BAttributeComponent.h"
 #include "BAICharacter.generated.h"
 
 class UPawnSensingComponent;
@@ -23,8 +24,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UBAttributeComponent* AttributeComp;
+
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
+
+	//UFUNCTION()
+	//void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
+
 
 
 public:	

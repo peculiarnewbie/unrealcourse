@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BBTService_CheckAttackRange.h"
+#include "AI/BBTService_CheckAttackRange.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 
