@@ -8,6 +8,8 @@
 #include "BAttributeComponent.h"
 #include "BrainComponent.h"
 #include "UI/BWorldUserWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ABAICharacter::ABAICharacter()
 {
@@ -16,6 +18,9 @@ ABAICharacter::ABAICharacter()
 	AttributeComp = CreateDefaultSubobject<UBAttributeComponent>("AttributeComp");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 
@@ -80,6 +85,9 @@ void ABAICharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponen
 			// ragdoll
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
+
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 
 			// set lifespan
 			SetLifeSpan(10.0f);

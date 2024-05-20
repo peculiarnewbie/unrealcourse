@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "BAttributeComponent.h"
+#include "BGameplayFunctionLibrary.h"
 
 // Sets default values
 ABMagicProjectile::ABMagicProjectile()
@@ -23,33 +24,11 @@ void ABMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		UBAttributeComponent* AttributeComp = Cast<UBAttributeComponent>(OtherActor->GetComponentByClass(UBAttributeComponent::StaticClass()));
-		if (AttributeComp)
+		if (UBGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(),  - Damage);
-
-			if (ImpactSound != nullptr)
-			{
-				// UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
-			}
-
 			Destroy();
 		}
 	}
-
-}
-
-// Called when the game starts or when spawned
-void ABMagicProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ABMagicProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
 
