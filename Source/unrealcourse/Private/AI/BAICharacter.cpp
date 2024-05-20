@@ -17,6 +17,7 @@ ABAICharacter::ABAICharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
+
 void ABAICharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -25,24 +26,33 @@ void ABAICharacter::PostInitializeComponents()
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ABAICharacter::OnHealthChanged);
 }
 
-void ABAICharacter::OnPawnSeen(APawn* Pawn)
+void ABAICharacter::SetTargetActor(AActor* NewTarget)
 {
 	AAIController* AIC = Cast<AAIController>(GetController());
 	if (AIC)
 	{
-		UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
-
-		BBComp->SetValueAsObject("TargetActor", Pawn);
-
-		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
+		AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
 	}
+
+}
+
+void ABAICharacter::OnPawnSeen(APawn* Pawn)
+{
+
+	SetTargetActor(Pawn);
+	
+	DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
 }
 
 void ABAICharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta)
 {
 	if (Delta < 0.0f)
 	{
-		
+
+		if (InstigatorActor != this)
+		{
+			SetTargetActor(InstigatorActor);
+		}
 
 		if (NewHealth <= 0.0f)
 		{

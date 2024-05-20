@@ -17,13 +17,11 @@ bool UBAttributeComponent::IsAlive() const
 	return Health > 0.0f;
 }
 
-bool UBAttributeComponent::ApplyHealthChange(float Delta)
+bool UBAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	Health += Delta;
 			
-	UE_LOG(LogTemp, Log, TEXT("hit %f"), Health);
-
-	OnHealthChanged.Broadcast(nullptr, this, HealthMax, Health, Delta);
+	OnHealthChanged.Broadcast(InstigatorActor, this, HealthMax, Health, Delta);
 
 	if (Health < 0.0f) Health = 0.0f;
 	else if (Health > HealthMax) Health = HealthMax;

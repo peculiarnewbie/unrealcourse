@@ -26,7 +26,7 @@ void ABMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		UBAttributeComponent* AttributeComp = Cast<UBAttributeComponent>(OtherActor->GetComponentByClass(UBAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-Damage);
+			AttributeComp->ApplyHealthChange(GetInstigator(),  - Damage);
 
 			if (ImpactSound != nullptr)
 			{

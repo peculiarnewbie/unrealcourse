@@ -14,7 +14,7 @@ void ABHealthPotion::ApplyPower(APawn* InstigatorPawn)
 {
 	UBAttributeComponent* AttributeComp = InstigatorPawn->GetComponentByClass<UBAttributeComponent>();
 	if (AttributeComp->GetIsHealthFull()) return;
-	AttributeComp->ApplyHealthChange(HealthValue);
+	AttributeComp->ApplyHealthChange(this, HealthValue);
 	Deactivate();
 }
 
