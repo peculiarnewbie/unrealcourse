@@ -3,6 +3,7 @@
 
 #include "BAttributeComponent.h"
 
+
 // Sets default values for this component's properties
 UBAttributeComponent::UBAttributeComponent()
 {
@@ -33,3 +34,25 @@ float UBAttributeComponent::GetIsHealthFull()
 {
 	return Health >= HealthMax;
 }
+
+UBAttributeComponent* UBAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if (FromActor)
+	{
+		return Cast<UBAttributeComponent>(FromActor->GetComponentByClass(UBAttributeComponent::StaticClass()));
+	}
+
+	return nullptr;
+}
+
+bool UBAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	UBAttributeComponent* AttributeComp = GetAttributes(Actor);
+	if (AttributeComp)
+	{
+		return AttributeComp->IsAlive();
+	}
+
+	return false;
+}
+

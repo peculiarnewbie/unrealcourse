@@ -71,6 +71,8 @@ void ABAICharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponen
 			SetLifeSpan(10.0f);
 
 		}
+
+		GetComponentByClass<USkeletalMeshComponent>()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
 	}
 
 }

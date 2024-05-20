@@ -15,7 +15,13 @@ class UNREALCOURSE_API UBAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
+	UFUNCTION(BlueprintCallable, Category="Attributes")
+	static UBAttributeComponent* GetAttributes(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category="Attributes", meta (DisplayName = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
+
 	UBAttributeComponent();
 
 protected:
