@@ -24,5 +24,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Ai")
 	TSubclassOf<AActor> ProjectileClass;
+
+public:
+
+	UBBTTask_RangedAttack();
 	
 };
