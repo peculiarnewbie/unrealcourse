@@ -9,6 +9,8 @@
 
 class UPawnSensingComponent;
 class UBAttrbuteComponent;
+class UUserWidget;
+class UBWorldUserWidget;
 
 UCLASS()
 class UNREALCOURSE_API ABAICharacter : public ACharacter
@@ -19,6 +21,11 @@ public:
 	ABAICharacter();
 
 protected:
+
+	UBWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	void SetTargetActor(AActor* NewTarget);
 

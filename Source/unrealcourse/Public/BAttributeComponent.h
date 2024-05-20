@@ -26,13 +26,16 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float Health;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float HealthMax;
 
 public:	
+
+	UFUNCTION(BlueprintCallable)
+	bool Kill(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;

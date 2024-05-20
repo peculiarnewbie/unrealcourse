@@ -109,6 +109,11 @@ void ABCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ABCharacter::PrimaryInteract);
 }
 
+void ABCharacter::HealSelf(float Amount /* = 100*/)
+{
+	AttributeComp->ApplyHealthChange(this, Amount);
+}
+
 void ABCharacter:: PrimaryAttack()
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");

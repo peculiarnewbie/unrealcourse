@@ -5,8 +5,6 @@
 #include "BGameModeBase.h"
 
 
-static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("bu.DamageMultiplier"), 1.0f, TEXT("Global Damage Modifier for Attribute Component."), ECVF_Cheat);
-
 // Sets default values for this component's properties
 UBAttributeComponent::UBAttributeComponent()
 {
@@ -32,13 +30,6 @@ bool UBAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 	if (!GetOwner()->CanBeDamaged())
 	{
 		return false;
-	}
-
-	if (Delta < 0.0f)
-	{
-		float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
-
-		Delta *= DamageMultiplier;
 	}
 
 	Health += Delta;

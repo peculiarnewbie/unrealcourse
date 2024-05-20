@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BAttributeComponent.h"
 #include "BrainComponent.h"
+#include "UI/BWorldUserWidget.h"
 
 ABAICharacter::ABAICharacter()
 {
@@ -53,6 +54,19 @@ void ABAICharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponen
 		{
 			SetTargetActor(InstigatorActor);
 		}
+
+		if (ActiveHealthBar == nullptr)
+		{
+
+			ActiveHealthBar = CreateWidget<UBWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+			if (ActiveHealthBar)
+			{
+				ActiveHealthBar->AttachedActor = this;
+				ActiveHealthBar->AddToViewport();
+			}
+		
+		}
+
 
 		if (NewHealth <= 0.0f)
 		{

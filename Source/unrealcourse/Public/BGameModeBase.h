@@ -38,11 +38,18 @@ protected:
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
+	UFUNCTION()
+	void RespawnPlayerElapsed(AController* Controller);
+
 public:
 
+	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 
 	ABGameModeBase();
 
 	virtual void StartPlay() override;
+
+	UFUNCTION(Exec)
+	void KillAll();
 	
 };
