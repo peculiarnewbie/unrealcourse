@@ -8,6 +8,7 @@
 #include "BAICharacter.generated.h"
 
 class UPawnSensingComponent;
+class UBAttrbuteComponent;
 
 UCLASS()
 class UNREALCOURSE_API ABAICharacter : public ACharacter
@@ -30,8 +31,8 @@ protected:
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 
-	//UFUNCTION()
-	//void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
 
 
 

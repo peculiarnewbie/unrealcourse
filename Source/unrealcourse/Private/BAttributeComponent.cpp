@@ -20,6 +20,8 @@ bool UBAttributeComponent::IsAlive() const
 bool UBAttributeComponent::ApplyHealthChange(float Delta)
 {
 	Health += Delta;
+			
+	UE_LOG(LogTemp, Log, TEXT("hit %f"), Health);
 
 	OnHealthChanged.Broadcast(nullptr, this, HealthMax, Health, Delta);
 

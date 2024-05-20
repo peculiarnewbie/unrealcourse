@@ -5,14 +5,16 @@
 #include "Perception/PawnSensingComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BAttributeComponent.h"
+#include "BrainComponent.h"
 
 ABAICharacter::ABAICharacter()
 {
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
 	AttributeComp = CreateDefaultSubobject<UBAttributeComponent>("AttributeComp");
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ABAICharacter::PostInitializeComponents()
@@ -20,8 +22,7 @@ void ABAICharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &ABAICharacter::OnPawnSeen);
-
-	//AttributeComp->OnHealthChanged.AddDynamic(this, &ABCharacter::OnHealthChanged);
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ABAICharacter::OnHealthChanged);
 }
 
 void ABAICharacter::OnPawnSeen(APawn* Pawn)
@@ -35,6 +36,33 @@ void ABAICharacter::OnPawnSeen(APawn* Pawn)
 
 		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
 	}
+}
+
+void ABAICharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta)
+{
+	if (Delta < 0.0f)
+	{
+		
+
+		if (NewHealth <= 0.0f)
+		{
+			// stop BT
+			AAIController* AIC = Cast<AAIController>(GetController());
+			if (AIC)
+			{
+				AIC->GetBrainComponent()->StopLogic("Killed");
+			}
+
+			// ragdoll
+			GetMesh()->SetAllBodiesSimulatePhysics(true);
+			GetMesh()->SetCollisionProfileName("Ragdoll");
+
+			// set lifespan
+			SetLifeSpan(10.0f);
+
+		}
+	}
+
 }
 
 

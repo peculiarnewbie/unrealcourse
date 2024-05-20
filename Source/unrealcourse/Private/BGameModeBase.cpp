@@ -8,6 +8,7 @@
 #include "AI/BAICharacter.h"
 #include "BAttributeComponent.h"
 #include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
 
 
 ABGameModeBase::ABGameModeBase()
@@ -25,28 +26,13 @@ void ABGameModeBase::StartPlay()
 
 void ABGameModeBase::SpawnBotTimerElapsed()
 {
-	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
-
-	if (ensure(QueryInstance))
-	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ABGameModeBase::OnQueryCompleted);
-	}
-}
-
-void ABGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
-{
-	if (QueryStatus != EEnvQueryStatus::Success)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawn bot EQS Query Failed!"));
-		return;
-	}
 
 	int32 NrOfAliveBots = 0;
 	for (TActorIterator<ABAICharacter> It(GetWorld()); It; ++It)
 	{
 		ABAICharacter* Bot = *It;
 		UBAttributeComponent* AttributeComp = Cast<UBAttributeComponent>(Bot->GetComponentByClass(UBAttributeComponent::StaticClass()));
-		if(AttributeComp && AttributeComp->IsAlive())
+		if(ensure(AttributeComp) && AttributeComp->IsAlive())
 		{
 			NrOfAliveBots++;
 		}
@@ -64,10 +50,28 @@ void ABGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 		return;
 	}
 
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
+	if (ensure(QueryInstance))
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ABGameModeBase::OnQueryCompleted);
+	}
+}
+
+void ABGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn bot EQS Query Failed!"));
+		return;
+	}
+
+	
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 
 	if (Locations.IsValidIndex(0))
 	{
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+
+		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
 	}
 }

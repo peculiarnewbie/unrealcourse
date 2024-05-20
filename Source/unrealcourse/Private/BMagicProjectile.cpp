@@ -15,6 +15,7 @@ ABMagicProjectile::ABMagicProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ABMagicProjectile::OnActorOverlap);
 
+	Damage = 10.0f;
 }
 
 
@@ -25,11 +26,11 @@ void ABMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		UBAttributeComponent* AttributeComp = Cast<UBAttributeComponent>(OtherActor->GetComponentByClass(UBAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-20.0f);
+			AttributeComp->ApplyHealthChange(-Damage);
 
 			if (ImpactSound != nullptr)
 			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
+				// UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
 			}
 
 			Destroy();
