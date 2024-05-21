@@ -7,6 +7,8 @@
 #include "BAttributeComponent.h"
 #include "BAICharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeath, AActor*, InstigatorActor, UBAttributeComponent*, OwningComp);
+
 class UPawnSensingComponent;
 class UBAttrbuteComponent;
 class UUserWidget;
@@ -43,9 +45,9 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
 
-
-
 public:	
 
+	UPROPERTY(BlueprintAssignable)
+	FOnDeath OnDeath;
 
 };

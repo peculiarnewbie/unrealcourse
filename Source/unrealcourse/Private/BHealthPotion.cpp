@@ -3,19 +3,24 @@
 
 #include "BHealthPotion.h"
 #include "BAttributeComponent.h"
+#include "BPlayerState.h"
 
 // Sets default values
 ABHealthPotion::ABHealthPotion()
 {
 	HealthValue = 50.0f;
+	Cost = 5;
 }
 
 void ABHealthPotion::ApplyPower(APawn* InstigatorPawn)
 {
 	UBAttributeComponent* AttributeComp = InstigatorPawn->GetComponentByClass<UBAttributeComponent>();
 	if (AttributeComp->GetIsHealthFull()) return;
-	AttributeComp->ApplyHealthChange(this, HealthValue);
-	Deactivate();
+	if (Cast<ABPlayerState>(InstigatorPawn->GetPlayerState())->SpendCredits(Cost))
+	{
+		AttributeComp->ApplyHealthChange(this, HealthValue);
+		Deactivate();
+	}
 }
 
 

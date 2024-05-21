@@ -23,4 +23,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float HealthValue;
 
+	UPROPERTY(EditDefaultsOnly)
+	int Cost;
+
 };

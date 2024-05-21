@@ -75,6 +75,7 @@ void ABAICharacter::OnHealthChanged(AActor* InstigatorActor, UBAttributeComponen
 
 		if (NewHealth <= 0.0f)
 		{
+			OnDeath.Broadcast(InstigatorActor, OwningComp);
 			// stop BT
 			AAIController* AIC = Cast<AAIController>(GetController());
 			if (AIC)

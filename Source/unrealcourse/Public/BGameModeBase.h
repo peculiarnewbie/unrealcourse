@@ -30,16 +30,34 @@ protected:
 	FTimerHandle TimerHandle_SpawnBots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	float SpawnTimerInterval;
+	float SpawnBotsInterval;
 
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
 
 	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
+	UEnvQuery* SpawnPowersQuery;
+
+	FTimerHandle TimerHandle_SpawnPowers;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
+	float SpawnPowerUpsInterval;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PowerUps")
+	TArray<TSubclassOf<AActor>> PowerClasses;
+
+	UFUNCTION()
+	void SpawnPowerTimerElapsed();
+
+	UFUNCTION()
+	void OnSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
 
 public:
 

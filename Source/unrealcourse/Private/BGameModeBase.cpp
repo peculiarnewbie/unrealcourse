@@ -10,13 +10,17 @@
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
 #include "BCharacter.h"
+#include "AI/BAICharacter.h"
+#include "BPlayerState.h"
+#include "Math/UnrealMathUtility.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("bu.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
 
 ABGameModeBase::ABGameModeBase()
 {
-	SpawnTimerInterval = 2.0f;
+	SpawnBotsInterval = 2.0f;
+	SpawnPowerUpsInterval = 5.0f;
 
 }
 
@@ -24,7 +28,8 @@ void ABGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ABGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ABGameModeBase::SpawnBotTimerElapsed, SpawnBotsInterval, true);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnPowers, this, &ABGameModeBase::SpawnPowerTimerElapsed, SpawnPowerUpsInterval, true);
 }
 
 void ABGameModeBase::KillAll()
@@ -44,7 +49,7 @@ void ABGameModeBase::KillAll()
 
 void ABGameModeBase::SpawnBotTimerElapsed()
 {
-	if (CVarSpawnBots.GetValueOnGameThread())
+	if (!CVarSpawnBots.GetValueOnGameThread())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Bot spawning disabled via cvar 'CVarSpawnBots'."));
 		return;
@@ -76,11 +81,11 @@ void ABGameModeBase::SpawnBotTimerElapsed()
 	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 	if (ensure(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ABGameModeBase::OnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ABGameModeBase::OnBotQueryCompleted);
 	}
 }
 
-void ABGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+void ABGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
 {
 	if (QueryStatus != EEnvQueryStatus::Success)
 	{
@@ -109,6 +114,35 @@ void ABGameModeBase::RespawnPlayerElapsed(AController* Controller)
 	}
 }
 
+void ABGameModeBase::SpawnPowerTimerElapsed()
+{	
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnPowersQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
+	if (ensure(QueryInstance))
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ABGameModeBase::OnSpawnQueryCompleted);
+	}
+
+}
+
+void ABGameModeBase::OnSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn powers EQS Query Failed!"));
+		return;
+	}
+
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+
+	if (Locations.IsValidIndex(0))
+	{
+		int index = FMath::RandRange(0, 1);
+		GetWorld()->SpawnActor<AActor>(PowerClasses[index], Locations[0], FRotator::ZeroRotator);
+	}
+
+
+}
+
 void ABGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 {
 	ABCharacter* Player = Cast<ABCharacter>(VictimActor);
@@ -122,7 +156,23 @@ void ABGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 		float RespawnDelay = 2.0f;
 
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
+		return;
 	}
+
+	ABAICharacter* Enemy = Cast<ABAICharacter>(VictimActor);
+	if (Enemy)
+	{
+		Player = Cast<ABCharacter>(Killer);
+		if (Player)
+		{
+			ABPlayerState* PlayerState = Cast<ABPlayerState>(Player->GetPlayerState());
+			PlayerState->AddCredits(1);
+		}
+
+	}
+
+	
+
 }
 
 
