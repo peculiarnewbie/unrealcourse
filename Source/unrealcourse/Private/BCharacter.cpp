@@ -6,7 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BInteractionComponent.h"
 #include "BAttributeComponent.h"
-
+#include "BActionComponent.h"
 
 	
 
@@ -27,11 +27,11 @@ ABCharacter::ABCharacter()
 
 	AttributeComp = CreateDefaultSubobject<UBAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<UBActionComponent>("ActionComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
-
-	teleportTime = 0.4f;
 }
 
 void ABCharacter::PostInitializeComponents()
@@ -74,6 +74,16 @@ void ABCharacter::MoveRight(float value)
 	AddMovementInput(RightVector, value);
 }
 
+void ABCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void ABCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
+}
+
 // Called every frame
 void ABCharacter::Tick(float DeltaTime)
 {
@@ -112,6 +122,9 @@ void ABCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponen
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ABCharacter::Dash);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ABCharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ABCharacter::PrimaryInteract);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ABCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ABCharacter::SprintStop);
 }
 
 void ABCharacter::HealSelf(float Amount /* = 100*/)
@@ -121,88 +134,25 @@ void ABCharacter::HealSelf(float Amount /* = 100*/)
 
 void ABCharacter:: PrimaryAttack()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FRotator projectileRotation = CalculateProjectileRotation(HandLocation, GetControlRotation(), 10000);
-
-	FTransform SpawnTM = FTransform(projectileRotation, HandLocation);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);;
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void ABCharacter::SpecialAttack()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_02");
-	FRotator projectileRotation = CalculateProjectileRotation(HandLocation, GetControlRotation(), 3000);
 
-	FTransform SpawnTM = FTransform(projectileRotation, HandLocation);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(SpecialProjectileClass, SpawnTM, SpawnParams);;
+	ActionComp->StartActionByName(this, "SpecialAttack");
 }
 
 void ABCharacter::Dash()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_02");
-	FRotator projectileRotation = CalculateProjectileRotation(HandLocation, GetControlRotation(), 3000);
-
-	FTransform SpawnTM = FTransform(projectileRotation, HandLocation);
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	DashActor = GetWorld()->SpawnActor<AActor>(DashProjectileClass, SpawnTM, SpawnParams);
-
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(
-		UnusedHandle, this, &ABCharacter::Teleport, teleportTime, false);
+	ActionComp->StartActionByName(this, "Dash");
 }
 
-void ABCharacter::Teleport()
+void ABCharacter::Teleport(AActor* DashActor)
 {
 	FVector newPosition = DashActor->GetActorLocation();
 	SetActorLocation(newPosition);
 	return;
-}
-
-FRotator ABCharacter::CalculateProjectileRotation(FVector start, FRotator rotation, float endRange)
-{
-	FRotator endRotation;
-
-	AActor* MyOwner = CameraComp->GetOwner();
-
-	FVector CameraPosition = CameraComp->GetComponentLocation();
-
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_MAX); // probably shouldn't do this 
-
-	FVector End = CameraPosition + (rotation.Vector() * endRange);
-
-	FHitResult Hit;
-	bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, CameraPosition, End, ObjectQueryParams);
-
-
-	if (bBlockingHit)
-	{
-		endRotation = ( Hit.ImpactPoint - start).Rotation();
-	}
-	else
-	{
-		endRotation = (Hit.TraceEnd - start).Rotation();
-	}
-
-//	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-//	DrawDebugLine(GetWorld(), CameraPosition, End, LineColor, false, 2.0f, 0, 2.0f);
-
-	return endRotation;
 }
 
 void ABCharacter::PrimaryInteract() 

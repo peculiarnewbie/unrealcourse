@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "BAttributeComponent.h"
 #include "BCharacter.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
 class UBInteractionComponent;
+class UBActionComponent;
 
 UCLASS()
 class UNREALCOURSE_API ABCharacter : public ACharacter
@@ -41,29 +41,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UBActionComponent* ActionComp;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void MoveForward(float value);
 	void MoveRight(float value);
+	void SprintStart();
+	void SprintStop();
 
 	void PrimaryAttack();
 	void SpecialAttack();
 	void PrimaryInteract();
-	float teleportTime;
-	AActor* DashActor;
 	void Dash();
-	void Teleport();
-
-	FRotator CalculateProjectileRotation(FVector start, FRotator rotation, float endRange);
-
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
 
 	virtual void PostInitializeComponents();
 
-	virtual FVector GetPawnViewLocation() const override;
 
 public:	
 	// Called every frame
@@ -74,6 +72,10 @@ public:
 
 	UFUNCTION(Exec)
 	void HealSelf(float Amount = 100);
+
+	virtual FVector GetPawnViewLocation() const override;
+
+	void Teleport(AActor* DashActor);
 
 
 };
