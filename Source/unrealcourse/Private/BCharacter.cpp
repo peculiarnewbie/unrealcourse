@@ -7,6 +7,7 @@
 #include "BInteractionComponent.h"
 #include "BAttributeComponent.h"
 #include "BActionComponent.h"
+#include "BGameModeBase.h"
 
 	
 
@@ -125,6 +126,8 @@ void ABCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponen
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ABCharacter::SprintStart);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ABCharacter::SprintStop);
+
+	PlayerInputComponent->BindAction("SaveGame", IE_Pressed, this, &ABCharacter::SaveGame);
 }
 
 void ABCharacter::HealSelf(float Amount /* = 100*/)
@@ -146,6 +149,13 @@ void ABCharacter::SpecialAttack()
 void ABCharacter::Dash()
 {
 	ActionComp->StartActionByName(this, "Dash");
+}
+
+void ABCharacter::SaveGame()
+{
+	ABGameModeBase* GameMode = Cast<ABGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameMode->WriteSaveGame();
+	UE_LOG(LogTemp, Log, TEXT("Save Key Pressed"));
 }
 
 void ABCharacter::Teleport(AActor* DashActor)

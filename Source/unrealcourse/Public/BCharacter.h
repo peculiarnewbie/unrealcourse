@@ -57,6 +57,8 @@ protected:
 	void PrimaryInteract();
 	void Dash();
 
+	void SaveGame();
+
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UBAttributeComponent* OwningComp, float HealthMax, float NewHealth, float Delta);
 

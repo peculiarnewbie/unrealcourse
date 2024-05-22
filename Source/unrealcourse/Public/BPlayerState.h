@@ -8,6 +8,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCreditsChanged, int, CurrentCredits, int, ChangeCount);
 
+class UBSaveGame;
+
 UCLASS()
 class UNREALCOURSE_API ABPlayerState : public APlayerState
 {
@@ -25,5 +27,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCreditsChanged OnCreditsChanged;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(UBSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(UBSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintCallable)
+	int GetCredits() const;
+
 
 };

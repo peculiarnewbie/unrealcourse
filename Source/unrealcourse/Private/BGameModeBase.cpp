@@ -13,6 +13,10 @@
 #include "AI/BAICharacter.h"
 #include "BPlayerState.h"
 #include "Math/UnrealMathUtility.h"
+#include "BSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
+
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("bu.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
@@ -22,6 +26,15 @@ ABGameModeBase::ABGameModeBase()
 	SpawnBotsInterval = 2.0f;
 	SpawnPowerUpsInterval = 5.0f;
 
+	SlotName = "SaveGame01";
+
+}
+
+void ABGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
 }
 
 void ABGameModeBase::StartPlay()
@@ -30,6 +43,17 @@ void ABGameModeBase::StartPlay()
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ABGameModeBase::SpawnBotTimerElapsed, SpawnBotsInterval, true);
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnPowers, this, &ABGameModeBase::SpawnPowerTimerElapsed, SpawnPowerUpsInterval, true);
+}
+
+void ABGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ABPlayerState* PS = NewPlayer->GetPlayerState<ABPlayerState>();
+	if (PS)
+	{
+		PS->LoadPlayerState(CurrentSaveGame);
+	}
 }
 
 void ABGameModeBase::KillAll()
@@ -171,8 +195,39 @@ void ABGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 
 	}
 
-	
+}
 
+void ABGameModeBase::WriteSaveGame()
+{
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ABPlayerState* PS = Cast<ABPlayerState>(GameState->PlayerArray[i]);
+		if (PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+		}
+	}
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void ABGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast<UBSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame data."));
+			return;
+		}
+	}
+	else
+	{
+		CurrentSaveGame = Cast<UBSaveGame>(UGameplayStatics::CreateSaveGameObject(UBSaveGame::StaticClass()));
+		
+		UE_LOG(LogTemp, Log, TEXT("Created new SaveGame data."));
+	}
 }
 
 

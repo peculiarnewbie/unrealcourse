@@ -2,6 +2,7 @@
 
 
 #include "BPlayerState.h"
+#include "BSaveGame.h"
 
 void ABPlayerState::AddCredits(int Count)
 {
@@ -18,4 +19,25 @@ bool ABPlayerState::SpendCredits(int Count)
 		return true;
 	}
 	return false;
+}
+
+int ABPlayerState::GetCredits() const
+{
+	return CreditsCount;
+}
+
+void ABPlayerState::SavePlayerState_Implementation(UBSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = CreditsCount;
+	}
+}
+
+void ABPlayerState::LoadPlayerState_Implementation(UBSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		CreditsCount = SaveObject->Credits;
+	}
 }
