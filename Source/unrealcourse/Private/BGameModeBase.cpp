@@ -16,6 +16,8 @@
 #include "BSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/GameStateBase.h"
+#include "BGameplayInterface.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("bu.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
@@ -34,7 +36,6 @@ void ABGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	LoadSaveGame();
 }
 
 void ABGameModeBase::StartPlay()
@@ -43,6 +44,8 @@ void ABGameModeBase::StartPlay()
 
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ABGameModeBase::SpawnBotTimerElapsed, SpawnBotsInterval, true);
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnPowers, this, &ABGameModeBase::SpawnPowerTimerElapsed, SpawnPowerUpsInterval, true);
+
+	LoadSaveGame();
 }
 
 void ABGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
@@ -208,6 +211,32 @@ void ABGameModeBase::WriteSaveGame()
 		}
 	}
 
+	CurrentSaveGame->SaveActors.Empty();
+
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<UBGameplayInterface>())
+		{
+			continue;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Adding actor to saveactors"));
+
+		FActorSaveData ActorData;
+		ActorData.ActorName = Actor->GetName();
+		ActorData.Transform = Actor->GetActorTransform();
+
+		FMemoryWriter MemWriter(ActorData.ByteData);
+
+		FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
+		Ar.ArIsSaveGame = true;
+
+		Actor->Serialize(Ar);
+
+		CurrentSaveGame->SaveActors.Add(ActorData);
+	}
+
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
 }
 
@@ -221,13 +250,50 @@ void ABGameModeBase::LoadSaveGame()
 			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame data."));
 			return;
 		}
+
+		for (FActorIterator It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			
+			if (!Actor->Implements<UBGameplayInterface>())
+			{
+				continue;
+			}
+	
+	
+			for (FActorSaveData ActorData : CurrentSaveGame->SaveActors)
+			{
+
+				if (ActorData.ActorName == Actor->GetName())
+				{
+					Actor->SetActorTransform(ActorData.Transform);
+
+					FMemoryReader MemReader(ActorData.ByteData);
+
+					FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
+					Ar.ArIsSaveGame = true;
+
+					Actor->Serialize(Ar);
+
+					IBGameplayInterface::Execute_OnActorLoaded(Actor);
+
+					
+					break;
+				}
+			}
+		}
 	}
+
 	else
 	{
 		CurrentSaveGame = Cast<UBSaveGame>(UGameplayStatics::CreateSaveGameObject(UBSaveGame::StaticClass()));
 		
 		UE_LOG(LogTemp, Log, TEXT("Created new SaveGame data."));
 	}
+
+
+
 }
 
 

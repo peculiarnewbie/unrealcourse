@@ -26,6 +26,11 @@ public:
 
 protected:
 
+	void OnActorLoaded_Implementation();
+
+	UPROPERTY(BlueprintReadOnly, SaveGame)
+	bool bLidOpened;
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BaseMesh;
 

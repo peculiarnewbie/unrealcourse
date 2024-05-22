@@ -18,12 +18,28 @@ ABItemChest::ABItemChest()
 
 	TargetPitch = 110;
 
+	bLidOpened = false;
+
+}
+
+void ABItemChest::OnActorLoaded_Implementation()
+{
+	Interact_Implementation(nullptr);
 }
 
 
 void ABItemChest::Interact_Implementation(APawn* IntegratorPawn)
 {
-	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
+	if (bLidOpened)
+	{
+		LidMesh->SetRelativeRotation(FRotator(0, 0, 0));
+		bLidOpened = false;
+	}
+	else 
+	{
+		LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
+		bLidOpened = true;
+	}
 }
 
 // Called when the game starts or when spawned
