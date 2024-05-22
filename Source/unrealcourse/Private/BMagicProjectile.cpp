@@ -16,6 +16,8 @@ ABMagicProjectile::ABMagicProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ABMagicProjectile::OnActorOverlap);
 
+	InitialLifeSpan = 10.0f;
+
 	Damage = 10.0f;
 }
 

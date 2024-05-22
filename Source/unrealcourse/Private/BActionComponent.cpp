@@ -3,6 +3,9 @@
 
 #include "BActionComponent.h"
 #include "BAction.h"
+#include "../unrealcourse.h"
+
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_BOLT);
 
 UBActionComponent::UBActionComponent()
 {
@@ -47,6 +50,8 @@ void UBActionComponent::AddAction(TSubclassOf<UBAction> ActionClass)
 
 bool UBActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
+	SCOPE_CYCLE_COUNTER(STAT_StartActionByName);
+
 	for (UBAction* Action : Actions)
 	{
 		if (Action && Action->ActionName == ActionName)
